@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart';
@@ -14,6 +15,7 @@ class _HomeScreenState extends State<HomeScreen>{
 
   File _image = File('assets/placeholder.png');
   ImagePicker picker = ImagePicker();
+  Image defaultImage = Image.asset('assets/placeholder.png');
   String imageUrl = "";
 
   @override
@@ -46,26 +48,29 @@ class _HomeScreenState extends State<HomeScreen>{
                 },
                 child: CircleAvatar(
                   radius: 80,
-                  child: _image != null
-                      ? ClipRRect(
-                    borderRadius: BorderRadius.circular(80),
-                    child: Image.file(
-                      _image,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.fitHeight,
-                    ),
-                  )
-                      : Container(
+                  child: Container(
                     decoration: BoxDecoration(
                         color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(50)),
-                    width: 100,
-                    height: 100,
-                    child: Icon(
+                        borderRadius: BorderRadius.circular(10)),
+                    width: 170,
+                    height: 170,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(width: 8),
+                        Text(
+                            "click to upload",
+                            style: TextStyle(
+                                color: Colors.black
+                            )
+                        ),
+
+                        Icon(
                       Icons.camera_alt,
                       color: Colors.grey[800],
                     ),
+
+                    ]
+                  ),
                   ),
                 ),
               ),
