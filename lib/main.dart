@@ -10,13 +10,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Image picker',
-      theme: new ThemeData(
-        primaryColor: const Color(0xFF02BB9F),
-        primaryColorDark: const Color(0xFF167F67),
-        accentColor: const Color(0xFF167F67),
-
-      ),
-      home: new HomeScreen(),
+           home: new HomeScreen(),
     );
   }
 }
