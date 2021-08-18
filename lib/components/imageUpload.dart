@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen>{
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
         child: Column(
           children: <Widget>[
             SizedBox(
@@ -95,16 +95,21 @@ class _HomeScreenState extends State<HomeScreen>{
             SizedBox(height: 5),
             buildTextFormField(
                 'blurb', 15, FontWeight.w400, 'Input your name'),
-            SizedBox(height: 5),
+            SizedBox(height: 15),
         ]
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                RaisedButton(
-                  onPressed: null,
-                  child: Text("submit"),
-                  color: Colors.amber,
+                ElevatedButton(
+                  child: Text('Submit'),
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.amber,
+                      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                      textStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
