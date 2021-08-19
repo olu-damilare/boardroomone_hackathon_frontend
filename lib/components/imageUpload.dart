@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart';
 
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+
 class HomeScreen extends StatefulWidget {
 
   @override
@@ -13,9 +16,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>{
 
-  File _image = File('assets/placeholder.png');
+  // File _image = File('assets/placeholder.png');
   ImagePicker picker = ImagePicker();
-  Image defaultImage = Image.asset('assets/placeholder.png');
+  // Image defaultImage = Image.asset('assets/placeholder.png');
   String imageUrl = "";
 
   @override
@@ -39,108 +42,80 @@ class _HomeScreenState extends State<HomeScreen>{
         child: Column(
           children: <Widget>[
             SizedBox(
-              height: 32,
+              height: 70,
             ),
             Center(
               child: GestureDetector(
                 onTap: () {
                   _showPicker(context);
                 },
-                child: CircleAvatar(
-                  radius: 80,
-                  child: Container(
+                 child: Container(
+                   height: 250.0,
+                   width: 250.0,
+                    child: imageUrl.length > 1 ?
+                    ClipRRect(
+                           borderRadius: BorderRadius.circular(50),
+                           child: Image.network(
+                             imageUrl,
+                             width: 150,
+                             height: 150,
+                             fit: BoxFit.cover,
+                           ),
+                         ) :
+                  Container(
                     decoration: BoxDecoration(
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(10)),
-                    width: 170,
-                    height: 170,
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(width: 8),
-                        Text(
-                            "click to upload",
-                            style: TextStyle(
-                                color: Colors.black
-                            )
-                        ),
+                    width: 180,
+                    height: 180,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 100.0),
+                      child: Column(
+                        children: <Widget>[
+                          Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey[800],
+                      ),
+                          Text(
+                              "click to upload",
+                              style: TextStyle(
+                                  color: Colors.black
+                              )
+                          ),
 
-                        Icon(
-                      Icons.camera_alt,
-                      color: Colors.grey[800],
-                    ),
-
-                    ]
+                      ]
                   ),
+                    ),
                   ),
                 ),
               ),
             ),
-
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-            SizedBox(height: 5),
-            Text(
-                "Name:",
-              style: TextStyle(
-                color: Colors.white,
-                  fontWeight: FontWeight.bold
-              )
-            ),
-            SizedBox(height: 5),
-            buildTextFormField(
-                'Name', 15, FontWeight.w400, 'Input your name'),
-            SizedBox(height: 5),
-            Text("Blurb:",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold
-                )
-            ),
-            SizedBox(height: 5),
-            buildTextFormField(
-                'blurb', 15, FontWeight.w400, 'Input your name'),
-            SizedBox(height: 15),
         ]
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  child: Text('Submit'),
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.amber,
-                      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                      textStyle: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ],
         ),
-      ),
+    ),
     );
   }
 
     _imgFromCamera() async {
-      File image = (await picker.pickImage(
+      XFile? image = (await picker.pickImage(
           source: ImageSource.camera, imageQuality: 50
-      )) as File;
+      ));
 
       setState(() {
-        _image = image;
+        modifyImage(image);
+        // _image = ;
       });
     }
 
     _imgFromGallery() async {
-      File image = (await  picker.pickImage(
+      XFile? image = (await  picker.pickImage(
           source: ImageSource.gallery, imageQuality: 50
-      )) as File;
+      ));
 
       setState(() {
-        _image = image;
+        modifyImage(image);
+
+        // _image = image;
       }
       );
     }
@@ -196,18 +171,24 @@ class _HomeScreenState extends State<HomeScreen>{
     );
   }
 
-  Future<void> modifyImage() async{
+  Future<void> modifyImage(XFile? imageFile) async {
+    var streamedResponse = new ByteStream(DelegatingStream.typed(imageFile!.openRead()));
+    var length = await imageFile.length();
 
-    try {
-      Response response = await get(
-          Uri.parse("http://localhost:8080/upload"));
-      Map data = jsonDecode(response.body);
+    var uri = Uri.parse("https://boardroom-one.herokuapp.com/upload");
 
-      imageUrl = data["secure_url"];
+    var request = new MultipartRequest("POST", uri);
+    var multipartFile = new MultipartFile('file', streamedResponse, length,
+        filename: basename(imageFile.path));
 
-    }catch(e){
-      print('caught error: $e');
-    }
+    request.files.add(multipartFile);
+    var response = await request.send();
+
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      imageUrl = json.decode(value)['secure_url'];
+      print(imageUrl);
+      print(value);
+    });
   }
-
 }
