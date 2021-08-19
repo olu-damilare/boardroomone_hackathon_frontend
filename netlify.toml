@@ -1,3 +1,0 @@
-[build]
-  command = "chmod u+x ./build.sh"
-  publish = "build/web"
