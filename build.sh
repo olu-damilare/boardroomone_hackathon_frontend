@@ -1,22 +1,32 @@
 #!/bin/bash
-FLUTTER_BRANCH=`grep channel: .metadata | sed 's/  channel: //g'`
 
-# Get flutter
-git clone https://github.com/flutter/flutter.git
-FLUTTER=flutter/bin/flutter
-
-#Flutter channel cmd
-cmd="${FLUTTER} channel ${FLUTTER_BRANCH}"
-
-# Set channel info and update
-DIR=$($cmd >& /dev/stdout)
-echo "<!-- $DIR -->"
-$FLUTTER config --enable-web
-if [[ $DIR == *"Your branch is behind"* ]]; then
-  echo "Update starting"
-  $FLUTTER upgrade
-  echo "Update finished"
+# Setup flutter
+FLUTTER=`which flutter`
+if [ $? -eq 0 ]
+then
+  # Flutter is installed
+  FLUTTER=`which flutter`
+else
+  # Get flutter
+  git clone https://github.com/flutter/flutter.git
+  FLUTTER=flutter/bin/flutter
 fi
 
+# Configure flutter
+FLUTTER_CHANNEL=beta
+FLUTTER_VERSION=v1.17.0
+$FLUTTER channel $FLUTTER_CHANNEL
+$FLUTTER version $FLUTTER_VERSION
+$FLUTTER config --enable-web
+
+# Setup dart
+DART=`echo $FLUTTER | sed 's/flutter$/cache\/dart-sdk\/bin\/dart/'`
+echo $DART
+
+# e.g. Run a dart command
+$DART foo/bar.dart
+
 # Build flutter for web
-$FLUTTER build web --release
+$FLUTTER build web
+
+echo "OK"
