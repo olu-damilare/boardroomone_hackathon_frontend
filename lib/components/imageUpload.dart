@@ -50,8 +50,8 @@ class _HomeScreenState extends State<HomeScreen>{
                   _showPicker(context);
                 },
                  child: Container(
-                   height: 250.0,
-                   width: 250.0,
+                   height: 300.0,
+                   width: 300.0,
                     child: imageUrl.length > 1 ?
                     ClipRRect(
                            borderRadius: BorderRadius.circular(50),
